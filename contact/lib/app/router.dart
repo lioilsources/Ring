@@ -6,11 +6,13 @@ import '../features/friends/friends_page.dart';
 import '../features/lobby/lobby_page.dart';
 import '../features/game/game_page.dart';
 import '../features/game/game_bloc.dart';
+import '../features/sandbox/sandbox_page.dart';
 import '../shared/supabase_client.dart';
 
 final router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/sandbox',
   redirect: (context, state) {
+    if (state.matchedLocation == '/sandbox') return null;
     final session = supabase.auth.currentSession;
     final onAuth = state.matchedLocation == '/auth';
     if (session == null && !onAuth) return '/auth';
@@ -18,6 +20,10 @@ final router = GoRouter(
     return null;
   },
   routes: [
+    GoRoute(
+      path: '/sandbox',
+      builder: (_, _) => const SandboxPage(),
+    ),
     GoRoute(
       path: '/auth',
       builder: (_, _) => const AuthPage(),
