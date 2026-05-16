@@ -27,7 +27,7 @@ void main() {
 
   test('PhysicsWorld applies finger force in contact zone', () {
     final world = PhysicsWorld(_bounds);
-    world.localFingerPos = world.ring.position;
+    world.localFingerPos = world.ring.position + const Offset(10, 0);
     world.localFingerActive = true;
     world.tick(1 / 60, _bounds);
     expect(world.ring.velocity.distance, greaterThan(0));
