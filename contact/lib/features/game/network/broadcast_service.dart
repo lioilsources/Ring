@@ -51,8 +51,8 @@ class BroadcastService {
             onRingHint(pos, vel);
           },
         )
-        .onPresenceJoin(callback: (payload) => onPresenceJoin?.call())
-        .onPresenceLeave(callback: (payload) => onPresenceLeave?.call())
+        .onPresenceJoin((payload) => onPresenceJoin?.call())
+        .onPresenceLeave((payload) => onPresenceLeave?.call())
         .subscribe();
   }
 

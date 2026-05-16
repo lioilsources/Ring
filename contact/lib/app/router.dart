@@ -1,7 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../features/auth/auth_page.dart';
 import '../features/friends/friends_page.dart';
 import '../features/lobby/lobby_page.dart';
@@ -21,11 +20,11 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/auth',
-      builder: (_, __) => const AuthPage(),
+      builder: (_, _) => const AuthPage(),
     ),
     GoRoute(
       path: '/',
-      builder: (_, __) => const FriendsPage(),
+      builder: (_, _) => const FriendsPage(),
     ),
     GoRoute(
       path: '/lobby',

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../game/game_bloc.dart';
 import 'room_service.dart';
-import '../../shared/supabase_client.dart';
 
 class LobbyPage extends StatefulWidget {
   final String roomId;
@@ -103,13 +102,13 @@ class _PulsingRingState extends State<_PulsingRing> with SingleTickerProviderSta
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _ctrl,
-      builder: (_, __) => Container(
+      builder: (_, _) => Container(
         width: 88 + _ctrl.value * 16,
         height: 88 + _ctrl.value * 16,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: Colors.white.withOpacity(0.3 + _ctrl.value * 0.3),
+            color: Colors.white.withValues(alpha: 0.3 + _ctrl.value * 0.3),
             width: 3,
           ),
         ),

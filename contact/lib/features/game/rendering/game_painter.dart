@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../physics/physics_world.dart';
 import '../physics/constants.dart';
@@ -49,12 +48,12 @@ class GamePainter extends CustomPainter {
       pos,
       kRingRadius * kContactZone,
       Paint()
-        ..color = color.withOpacity(0.07)
+        ..color = color.withValues(alpha:0.07)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20),
     );
 
     // Dot
-    canvas.drawCircle(pos, 10, Paint()..color = color.withOpacity(0.9));
+    canvas.drawCircle(pos, 10, Paint()..color = color.withValues(alpha:0.9));
   }
 
   void _drawRing(Canvas canvas, Offset pos) {
@@ -64,7 +63,7 @@ class GamePainter extends CustomPainter {
       pos,
       kRingRadius + 8,
       Paint()
-        ..color = const Color(0xFFFFFFFF).withOpacity(0.05 + 0.04 * pulse)
+        ..color = const Color(0xFFFFFFFF).withValues(alpha:0.05 + 0.04 * pulse)
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 16),
     );
 

@@ -1,30 +1,54 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'dart:ui';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:contact/main.dart';
+import 'package:contact/features/game/physics/ring_body.dart';
+import 'package:contact/features/game/physics/physics_world.dart';
+import 'package:contact/features/game/physics/flick_detector.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  const bounds = Size(400, 800);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  test('RingBody stays within bounds after ticks', () {
+    final ring = RingBody();
+    ring.velocity = const Offset(5000, 5000);
+    for (var i = 0; i < 120; i++) {
+      ring.tick(1 / 60, bounds);
+    }
+    expect(ring.position.dx, greaterThanOrEqualTo(ring.radius));
+    expect(ring.position.dx, lessThanOrEqualTo(bounds.width - ring.radius));
+    expect(ring.position.dy, greaterThanOrEqualTo(ring.radius));
+    expect(ring.position.dy, lessThanOrEqualTo(bounds.height - ring.radius));
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  test('RingBody velocity decays with drag', () {
+    final ring = RingBody();
+    ring.velocity = const Offset(1000, 0);
+    ring.tick(1 / 60, bounds);
+    expect(ring.velocity.dx, lessThan(1000));
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  test('PhysicsWorld applies finger force in contact zone', () {
+    final world = PhysicsWorld();
+    world.init(bounds);
+    final center = world.ring.position;
+    world.setLocalFinger(center, true);
+    final velBefore = world.ring.velocity.distance;
+    world.tick(1 / 60);
+    expect(world.ring.velocity.distance, greaterThanOrEqualTo(velBefore));
+  });
+
+  test('FlickDetector returns null below threshold', () {
+    final detector = FlickDetector();
+    const pos = Offset(100, 100);
+    detector.update(pos, 1 / 60);
+    final impulse = detector.update(const Offset(101, 100), 1 / 60);
+    expect(impulse, isNull);
+  });
+
+  test('FlickDetector returns impulse above threshold', () {
+    final detector = FlickDetector();
+    detector.update(const Offset(0, 0), 1 / 60);
+    final impulse = detector.update(const Offset(100, 0), 1 / 60);
+    expect(impulse, isNotNull);
+    expect(impulse!.dx, greaterThan(0));
   });
 }

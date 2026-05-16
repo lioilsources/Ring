@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'ring_body.dart';
 import 'constants.dart';
 
 class FlickDetector {
