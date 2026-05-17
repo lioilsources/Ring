@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import '../game/physics/physics_world.dart';
-import '../game/rendering/game_painter.dart';
+import '../game/physics/ring_rotation.dart';
+import '../game/rendering/torus_painter.dart';
 
 class SandboxPage extends StatefulWidget {
   const SandboxPage({super.key});
@@ -12,6 +13,7 @@ class SandboxPage extends StatefulWidget {
 
 class _SandboxPageState extends State<SandboxPage> with SingleTickerProviderStateMixin {
   PhysicsWorld? _world;
+  final RingRotation _rotation = RingRotation();
   late Ticker _ticker;
   Duration _lastTime = Duration.zero;
   double _animTime = 0.0;
@@ -31,7 +33,15 @@ class _SandboxPageState extends State<SandboxPage> with SingleTickerProviderStat
 
     final size = MediaQuery.of(context).size;
     _world ??= PhysicsWorld(size);
-    _world!.tick(dt.clamp(0.001, 0.05), size);
+    final world = _world!;
+
+    world.tick(dt.clamp(0.001, 0.05), size);
+
+    _rotation.applyVelocity(world.ring.velocity);
+    final impulse = world.pendingImpulse;
+    if (impulse != null) _rotation.applyImpulse(impulse);
+    _rotation.tick(dt.clamp(0.001, 0.05));
+
     setState(() {});
   }
 
@@ -65,7 +75,7 @@ class _SandboxPageState extends State<SandboxPage> with SingleTickerProviderStat
                 world.localFingerActive = false;
               }),
               child: CustomPaint(
-                painter: GamePainter(world, _animTime),
+                painter: TorusPainter(world, _rotation, _animTime),
                 child: const SizedBox.expand(),
               ),
             ),
