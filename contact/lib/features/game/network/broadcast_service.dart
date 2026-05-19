@@ -4,6 +4,7 @@ import '../../../shared/supabase_client.dart';
 
 typedef FingerCallback = void Function(Offset pos, bool active, Offset? impulse);
 typedef HintCallback = void Function(Offset pos, Offset vel);
+typedef FaceCallback = void Function(String url);
 
 class BroadcastService {
   RealtimeChannel? _channel;
@@ -16,6 +17,7 @@ class BroadcastService {
     required HintCallback onRingHint,
     VoidCallback? onPresenceJoin,
     VoidCallback? onPresenceLeave,
+    FaceCallback? onFace,
   }) {
     _channel = supabase
         .channel('game:$roomId')
@@ -51,6 +53,13 @@ class BroadcastService {
             onRingHint(pos, vel);
           },
         )
+        .onBroadcast(
+          event: 'face',
+          callback: (payload) {
+            final url = payload['url'];
+            if (url is String) onFace?.call(url);
+          },
+        )
         .onPresenceJoin((payload) => onPresenceJoin?.call())
         .onPresenceLeave((payload) => onPresenceLeave?.call())
         .subscribe();
@@ -77,6 +86,16 @@ class BroadcastService {
         'ry': pos.dy,
         'vx': vel.dx,
         'vy': vel.dy,
+        'ts': DateTime.now().millisecondsSinceEpoch,
+      },
+    );
+  }
+
+  Future<void> sendFace(String url) async {
+    await _channel?.sendBroadcastMessage(
+      event: 'face',
+      payload: {
+        'url': url,
         'ts': DateTime.now().millisecondsSinceEpoch,
       },
     );

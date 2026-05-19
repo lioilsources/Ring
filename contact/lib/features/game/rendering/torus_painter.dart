@@ -24,7 +24,12 @@ class TorusPainter extends CustomPainter {
   // Light direction (normalized, in camera space — upper-left-front)
   static const double _lx = 0.408, _ly = -0.816, _lz = -0.408;
 
-  const TorusPainter(this.world, this.rotation, this.animTime);
+  // When false, the opaque background + walls are skipped so the torus can
+  // be layered transparently over another layer (e.g. the water surface).
+  final bool drawEnvironment;
+
+  const TorusPainter(this.world, this.rotation, this.animTime,
+      {this.drawEnvironment = true});
 
   // --- Precomputed base geometry (constant; cos/sin of phi/theta) -----------
   static List<double>? _basePos; // [vi*3 + {0,1,2}]
@@ -55,8 +60,10 @@ class TorusPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    _drawBackground(canvas, size);
-    _drawWalls(canvas, size);
+    if (drawEnvironment) {
+      _drawBackground(canvas, size);
+      _drawWalls(canvas, size);
+    }
     _drawContactShadow(canvas);
     _drawTorus(canvas);
     _drawFingers(canvas);
